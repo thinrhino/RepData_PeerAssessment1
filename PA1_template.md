@@ -6,7 +6,8 @@ output:
 # Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
-```{r, loaddata, echo=TRUE}
+
+```r
 # Load required libraries
 library(xtable)
 
@@ -21,7 +22,8 @@ par(mfrow=c(1,1))
 ```
 
 ## What is mean total number of steps taken per day?
-```{r, totaldailysteps, echo=TRUE}
+
+```r
 # Count steps per day
 total.daily.steps <- aggregate(act.data$steps, by=list(act.data$date), sum)
 
@@ -33,19 +35,24 @@ ggplot(total.daily.steps,
        aes(x=x)) + geom_histogram(binwidth=3000,
                                   color='black',
                                   fill='white')
+```
 
+![plot of chunk totaldailysteps](figure/totaldailysteps.png) 
+
+```r
 # Calculate summary statistics for total steps per day
 summary.stats <- summary(total.daily.steps$x)
 mean.daily.steps <- summary.stats["Mean"]
 median.daily.steps <- summary.stats["Median"]
 ```
 
-The **mean total steps per day** is **`r mean.daily.steps`**  
-The **median total steps per day** is **`r median.daily.steps`**
+The **mean total steps per day** is **1.08 &times; 10<sup>4</sup>**  
+The **median total steps per day** is **1.08 &times; 10<sup>4</sup>**
 
 ## What is the average daily activity pattern?
 
-```{r, avedailypattern, echo=TRUE}
+
+```r
 # Calculate the average steps (across all days) for each interval
 mean.per.interval.steps <- tapply(act.data$steps, act.data$interval, 
     function(x) mean(x, na.rm=T))
@@ -57,7 +64,11 @@ plot(as.integer(x.axis.range),
     mean.per.interval.steps, type="l", main="Average Steps Per Interval",
     xlab="Interval", ylab="Number of steps", xaxt="n")
 axis(1, at=x.axis.range, names(mean.per.interval.steps))
+```
 
+![plot of chunk avedailypattern](figure/avedailypattern.png) 
+
+```r
 # Find which 5-minute interval, on average across all the days in the dataset, 
 # contains the maximum number of steps?
 max.mean <- max(mean.per.interval.steps)
@@ -66,26 +77,33 @@ highest.average <- mean.per.interval.steps[mean.per.interval.steps==max.mean]
 summary(mean.per.interval.steps)
 ```
 
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    2.49   34.10   37.40   52.80  206.00
+```
+
 The 5-minute interval with the highest number of steps on average is 
-**`r names(highest.average)[1]`**.   
-It has an average of **`r round(max.mean, digits=0)`** steps.
+**835**.   
+It has an average of **206** steps.
 
 ## Imputing missing values
 
 
-```{r, imputemissingval1, echo=TRUE}
+
+```r
 # Calculate and report the total number of missing values in the dataset 
 # (i.e. the total number of rows with NAs)
 missing.count <- sum(!complete.cases(act.data))
 ```
 
-The total number of rows with missing values is **`r missing.count`**.  
+The total number of rows with missing values is **2304**.  
 
 **Imputation method used:**  
 Missing step values in an interval were filled-in with the mean number of
 steps for that specific (5-minute) interval.
 
-```{r, imputemissingval2, echo=TRUE}
+
+```r
 # Fill-in missing data with the mean for the 5-minute interval.
 # Create a new dataset that is equal to the original dataset but with 
 # the missing data filled in.
@@ -100,7 +118,11 @@ for (i in 1:nrow(act.data)) {
 new.total.daily.steps <- tapply(filled.in.data$steps, filled.in.data$date, sum)
 hist(new.total.daily.steps,main="Total Steps Per Day (with Imputed Values)", 
      xlab="Number of steps", col="pink")
+```
 
+![plot of chunk imputemissingval2](figure/imputemissingval2.png) 
+
+```r
 # Calculate and report the mean and median total number of steps taken per day. 
 new.summary.stats <- summary(new.total.daily.steps)
 new.mean.daily.steps <- new.summary.stats["Mean"]
@@ -110,10 +132,16 @@ new.median.daily.steps <- new.summary.stats["Median"]
 print(new.summary.stats)
 ```
 
-The mean total steps per day is **`r round(new.mean.daily.steps, digits=2)`**.  
-The median total steps per day is **`r round(new.median.daily.steps, digits=2)`**.  
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    9820   10800   10800   12800   21200
+```
 
-```{r, origvsimputed, echo=TRUE, results="asis"}
+The mean total steps per day is **1.08 &times; 10<sup>4</sup>**.  
+The median total steps per day is **1.08 &times; 10<sup>4</sup>**.  
+
+
+```r
 # Create a data frame to hold the summaries of the original data set
 # and the filled-in data set
 cmp.df <- data.frame(rbind(summary.stats[1:6], new.summary.stats),
@@ -127,6 +155,15 @@ cmp.table <- xtable(cmp.df, display=c("s", "d", "d", "d", "d", "d", "d", "d"),
 print(cmp.table, type="html", caption.placement="top")
 ```
 
+<!-- html table generated in R 3.1.0 by xtable 1.7-3 package -->
+<!-- Thu Jul 17 09:05:49 2014 -->
+<TABLE border=1>
+<CAPTION ALIGN="top"> Total Steps Per Day Summary </CAPTION>
+<TR> <TH>  </TH> <TH> Min. </TH> <TH> 1st Qu. </TH> <TH> Median </TH> <TH> Mean </TH> <TH> 3rd Qu. </TH> <TH> Max. </TH> <TH> NA's </TH>  </TR>
+  <TR> <TD align="right"> Original </TD> <TD align="right">  41 </TD> <TD align="right"> 8840 </TD> <TD align="right"> 10800 </TD> <TD align="right"> 10800 </TD> <TD align="right"> 13300 </TD> <TD align="right"> 21200 </TD> <TD align="right">   8 </TD> </TR>
+  <TR> <TD align="right"> Filled-in (imputed) </TD> <TD align="right">  41 </TD> <TD align="right"> 9820 </TD> <TD align="right"> 10800 </TD> <TD align="right"> 10800 </TD> <TD align="right"> 12800 </TD> <TD align="right"> 21200 </TD> <TD align="right">   0 </TD> </TR>
+   </TABLE>
+
 <br>
 **Comparison between original data set and filled-in data set:**  
 - The original and filled in data sets have the same *min*, *max*,
@@ -136,7 +173,8 @@ print(cmp.table, type="html", caption.placement="top")
 - The two data sets differ in their *1st quartile* and *3rd quartile* values.
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r, weekdaysvsweekends, echo=TRUE, fig.height=8}
+
+```r
 # Create a new factor variable in the dataset with two levels – “weekday” 
 # and “weekend” indicating whether a given date is a weekday or weekend day.
 day.of.week <- weekdays(filled.in.data$date)
@@ -178,3 +216,5 @@ plot(x.axis.range,
     xlab="Interval", ylab="Number of steps", xaxt="n")
 axis(1, at=x.axis.range, names(mean.per.interval.weekdays))
 ```
+
+![plot of chunk weekdaysvsweekends](figure/weekdaysvsweekends.png) 
